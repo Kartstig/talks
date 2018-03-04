@@ -2,7 +2,7 @@
  [{description, "A basic key-value store"},
   {vsn, "0.1.0"},
   {registered, []},
-  {mod, { kvgs_app, []}},
+  {mod, { kvgs, []}},
   {applications,
    [kernel,
     stdlib
