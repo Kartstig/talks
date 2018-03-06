@@ -1,0 +1,19 @@
+screen -t "presentation"
+stuff "cd reveal.js^M"
+stuff "yarn start^M"
+screen -t "kvgs"
+stuff "cd kvgs^M"
+stuff "script/run^M"
+screen -t "kvagent"
+stuff "cd kvagent^M"
+stuff "iex -S mix^M"
+
+# Color Settings
+altscreen on
+term screen-256color
+
+#change the hardstatus settings to give an window list at the bottom of the
+#screen, with the time and date and with the current window highlighted
+hardstatus alwayslastline
+#hardstatus string '%{= kG}%-Lw%{= kW}%50> %n%f* %t%{= kG}%+Lw%< %{= kG}%-=%c:%s%{-}'
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W}%c %{g}]'
