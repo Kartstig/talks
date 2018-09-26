@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Genserver vs Agent</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		<style>
+			div.slide-background {
+				background-size: cover;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+					## GenServer vs Agent
+					_By Herman Singh_
+
+
+					[herman@matchedpattern.com](herman@matchedpattern.com)
+					Twitter: [@SinghHermann](https://twitter.com/singhhermann)
+				</section>
+				<section>
+					<h2>This talk</h2>
+					<ul>
+						<li>Introduction to GenServer (Erlang)</li>
+						<li>Writing a GenServer (Erlang)</li>
+						<li>Introduction to Agent (Elixir)</li>
+						<li>Writing an Agent (Elixir)</li>
+					</ul>
+				</section>
+				<section>
+					<h2>What is a GenServer?</h2>
+					<ul>
+						<li class="fragment">A behavior</li>
+						<li class="fragment">An API for client/server</li>
+						<li class="fragment">A supervised (or unsupervised) process</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Why use a GenServer?</h2>
+				</section>
+				<section style="max-height: 100%;max-width: 100%;" data-background="/image/mario.jpg">
+				</section>
+				<section>
+						<img style="background:white;"" src="/image/actors.png">
+				</section>
+				<section>
+					<section>
+						<h5>GenServer API</h5>
+						<span class="fragment">
+							<pre><code style="font-size: 0.8em; max-height: 800px;" data-trim>
+	start_link() ->
+		gen_server:start_link({local, my_server}, ?MODULE, [], []).
+
+	init([]) ->
+		{ok, #{}}.
+
+	handle_call({action, Arg1, Arg2}, _From, State) ->
+		...
+		{reply, {ok}, NewState}.
+
+	handle_info(Msg, State) ->
+		...
+		{noreply, State}.
+
+	terminate(normal, _State) ->
+		...
+		ok.
+
+	code_change(_OldVsn, State, _Extra) ->
+		{ok, State}.
+							</code></pre>
+						</span>
+					</section>
+					<section>
+						<h3>Code Demo</h3>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>What is an Agent?</h2>
+						<ul>
+							<li class="fragment">A module that implements GenSerer</li>
+							<li class="fragment">A wrapper around state</li>
+							<li class="fragment">A supervised (or unsupervised) process</li>
+						</ul>
+						<div class="fragment">
+							<p>
+								<i>As defined in <a href="https://github.com/elixir-lang/elixir/blob/408bbbce4a2a1e7efd3b58bae1b6fe4e26365319/lib/elixir/lib/agent.ex#L47">Elixir docs</a></i>
+							</p>
+							<blockquote style="font-size: 0.75em;">
+							Agents provide a segregation between the client and server APIs (similar to GenServers). In particular, the anonymous functions given to the `Agent` are executed inside the agent (the server). This distinction is important because you may want to avoid expensive operations inside the agent, as they will effectively block the agent until the request is fulfilled.
+							</blockquote>
+						</div>
+					</section>
+					<section>
+						<h3>Code Demo</h3>
+					</section>
+				</section>
+				<section>
+					<h3>Questions?</h3>
+					<p>Slide source: <a href="https://github.com/Kartstig/talks/tree/master/2018/0306-Genserver_vs_Agent">GitHub</a>
+					<p>Thanks to <img src="/image/NameWithLogoBlack.png"></p>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
