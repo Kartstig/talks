@@ -1,12 +1,9 @@
 screen -t "presentation"
-stuff "cd reveal.js^M"
-stuff "yarn start^M"
-screen -t "kvgs"
-stuff "cd kvgs^M"
-stuff "script/run^M"
-screen -t "kvagent"
-stuff "cd kvagent^M"
-stuff "iex -S mix^M"
+stuff "cd reveal.js && yarn install && yarn start^M"
+screen -t "code"
+stuff "cd healthly && mix deps.get && elixir --cookie 1234 --sname test -S mix phx.server^M"
+screen -t "console"
+stuff "iex --remsh test@herman-Galago-Pro --cookie 1234 --sname herman^M"
 
 # Color Settings
 altscreen on

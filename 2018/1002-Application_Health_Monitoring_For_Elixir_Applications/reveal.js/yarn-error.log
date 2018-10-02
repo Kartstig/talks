@@ -1,0 +1,80 @@
+Arguments: 
+  /home/herman/node-v10.4.1-linux-x64/bin/node /usr/local/bin/yarn start
+
+PATH: 
+  /home/herman/.npm-global/bin:/home/herman/bin:/home/herman/.local/bin:/home/herman/.npm-global/bin:/opt/OpenPrinting-Gutenprint/sbin:/opt/OpenPrinting-Gutenprint/bin:/home/herman/.rvm/gems/ruby-2.5.1/bin:/home/herman/.rvm/gems/ruby-2.5.1@global/bin:/home/herman/.rvm/rubies/ruby-2.5.1/bin:/home/herman/bin:/home/herman/.local/bin:/opt/OpenPrinting-Gutenprint/sbin:/opt/OpenPrinting-Gutenprint/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/herman/.rvm/bin:/home/herman/.rvm/bin:/home/herman/dev/rebar3:/home/herman/eagle-9.0.0:/home/herman/.rvm/bin:/home/herman/.rvm/bin:/home/herman/.rvm/bin:/home/herman/dev/rebar3:/home/herman/eagle-9.0.0:/home/herman/.rvm/bin
+
+Yarn version: 
+  1.5.1
+
+Node version: 
+  10.4.1
+
+Platform: 
+  linux x64
+
+npm manifest: 
+  {
+    "name": "reveal.js",
+    "version": "3.7.0",
+    "description": "The HTML Presentation Framework",
+    "homepage": "http://revealjs.com",
+    "subdomain": "revealjs",
+    "main": "js/reveal.js",
+    "scripts": {
+      "test": "grunt test",
+      "start": "grunt serve",
+      "build": "grunt"
+    },
+    "author": {
+      "name": "Hakim El Hattab",
+      "email": "hakim.elhattab@gmail.com",
+      "web": "http://hakim.se"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/hakimel/reveal.js.git"
+    },
+    "engines": {
+      "node": ">=4.0.0"
+    },
+    "devDependencies": {
+      "express": "^4.16.2",
+      "grunt": "^1.0.1",
+      "grunt-autoprefixer": "^3.0.4",
+      "grunt-cli": "^1.2.0",
+      "grunt-contrib-connect": "^1.0.2",
+      "grunt-contrib-cssmin": "^2.2.1",
+      "grunt-contrib-jshint": "^1.1.0",
+      "grunt-contrib-qunit": "^2.0.0",
+      "grunt-contrib-uglify": "^3.3.0",
+      "grunt-contrib-watch": "^1.0.0",
+      "grunt-sass": "^2.0.0",
+      "grunt-retire": "^1.0.7",
+      "grunt-zip": "~0.17.1",
+      "mustache": "^2.3.0",
+      "socket.io": "^1.7.3"
+    },
+    "license": "MIT"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: Command failed.
+  Exit code: 127
+  Command: sh
+  Arguments: -c grunt serve
+  Directory: /home/herman/dev/talks/2018/1002-Application_Health_Monitoring_For_Elixir_Applications/reveal.js
+  Output:
+  
+      at ProcessTermError.MessageError (/usr/local/lib/node_modules/yarn/lib/cli.js:186:110)
+      at new ProcessTermError (/usr/local/lib/node_modules/yarn/lib/cli.js:226:113)
+      at ChildProcess.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:30281:17)
+      at ChildProcess.emit (events.js:182:13)
+      at maybeClose (internal/child_process.js:961:16)
+      at Process.ChildProcess._handle.onexit (internal/child_process.js:248:5)

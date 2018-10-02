@@ -1,0 +1,123 @@
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.js"></script>
+
+<div class="jumbotron">
+  <h3>Health.ly Dashboard</h3>
+
+  <div id="message"></div>
+</div>
+<div id="checks"></div>
+
+<script id="msg-template" type="text/x-handlebars-template">
+  <div class="message">
+    {{#if healthy}}
+      <h1 class="good-msg">Healthy <i class="fa fa-heartbeat"></i></h1>
+    {{else}}
+      <h1 class="bad-msg">Unhealthy <i class="fa fa-heartbeat"></i></h1>
+    {{/if}}
+  </div>
+</script>
+
+<script id="server-template" type="text/x-handlebars-template">
+  <div class="entry">
+    {{#if healthy}}
+      <h1 class="good-msg"><i class="fas fa-server"></i> {{name}}</h1>
+    {{else}}
+      <h1 class="bad-msg"><i class="fas fa-server"></i> {{name}}</h1>
+    {{/if}}
+    <div class="body">
+      {{status}}
+    </div>
+  </div>
+  <div class="buttons">
+    {{#if healthy}}
+      <button class="btn btn-xs btn-danger" onClick='App.stopService("{{name}}");'>STOP</button>
+    {{else}}
+      <button class="btn btn-xs btn-success" onClick='App.startService("{{name}}");'>START</button>
+    {{/if}}
+  </div>
+</script>
+
+<script type="text/javascript">
+(function($) {
+  const SERVER_TEMPL = Handlebars.compile($("#server-template").html());
+  const MSG_TEMPL = Handlebars.compile($("#msg-template").html());
+  let serverList = [];
+  let healthData = {};
+
+  function render() {
+    healthCheck();
+    if (
+      healthData &&
+      healthData["result"] &&
+      healthData["result"]["msg"] &&
+      healthData["result"]["check_results"]
+    ) {
+      let output = ""
+      const results = healthData["result"]["check_results"];
+      const msg = healthData["result"]["msg"] === "healthy";
+
+      $('#message').html(MSG_TEMPL({healthy: msg}));
+
+      $.each(results, function(i, result) {
+        const name = result[0].replace(/_/g, '.');
+        output += SERVER_TEMPL({
+          name: name,
+          healthy: result[1] === "ok",
+          status: result[1]
+        });
+      });
+
+      $('#checks').html(output);
+    }
+    setTimeout(render, 1000);
+  };
+
+  function startService(name) {
+    console.log("Starting " + name);
+    $.ajax({
+      method: "GET",
+      url: "/service?name=" + name + "&action=START",
+      success: function(data) {
+        console.log(data);
+      }
+    });
+    render();
+  }
+
+  function stopService(name) {
+    console.log("Stopping " + name)
+    $.ajax({
+      method: "GET",
+      url: "/service?name=" + name + "&action=STOP",
+      success: function(data) {
+        console.log(data);
+      }
+    });
+    render();
+  }
+
+  function healthCheck() {
+    const apps = $.ajax({
+      method: "GET",
+      url: "/_health",
+      success: function(data) {
+        healthData = data;
+      }
+    });
+  }
+
+  $(document).ready(function() {
+    healthCheck();
+
+    render();
+  });
+
+  App = {};
+  App.startService = startService;
+  App.stopService = stopService;
+})($);
+</script>
