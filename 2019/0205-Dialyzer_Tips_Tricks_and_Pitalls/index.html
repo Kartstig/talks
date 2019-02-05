@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Dialyzer - Common Pitfalls, Tips & Tricks</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+    <style>
+      .reveal h1,
+      .reveal h2,
+      .reveal h3,
+      .reveal h4,
+      .reveal h5,
+      .reveal h6 {
+        margin: 0 0 20px 0;
+        color: #eee8d5;
+        font-family: "League Gothic", Impact, sans-serif;
+        line-height: 0.9em;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        text-shadow: none;
+      }
+
+      section.small,
+      div.small,
+      p.small {
+        font-size: 0.8em;
+      }
+
+      section.xsmall,
+      div.xsmall,
+      p.xsmall {
+        font-size: 0.6em;
+      }
+
+      pre.red-text,
+      div.red-text,
+      p.red-text {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section data-markdown>
+          ### Dialyzer - Common Pitfalls, Tips & Tricks
+          _By Herman Singh_
+
+
+          > <i class="fas fa-envelope"></i><a href="mailto:herman@scriptdrop.co">herman@scriptdrop.co</a>
+
+          > Twitter: [@SinghHermann](https://twitter.com/singhhermann)
+
+          > GitHub: [@KartStig](https://github.com/Kartstig)
+          > These slides: https://github.com/Kartstig/talks
+        </section>
+        <section>
+          <h2>This Talk</h2>
+          <p data-markdown style="text-align: left">
+            - History of Dialyzer
+            - Dialyzer Strategy
+            - Common Errors
+            - Dialyzer Tips
+          </p>
+        </section>
+        <section>
+          <section>
+            <h2>History of Dialyzer</h2>
+          </section>
+          <section>
+            <h2>Let's add a type system!</h2>
+            <p data-markdown class="xsmall">
+              - Simon Marlow (lead developer of the Glasgow Haskell Compilier)
+              - Philip Wadler (Haskell)
+            </p>
+            <p data-markdown class="xsmall">
+              > One day Phil phoned me up and announced that a) Erlang needed a type system, b) he had written a small prototype of a type system and c) he had a one year’s sabbatical and was going to write a type system for Erlang and “were we interested?” Answer —“Yes.”
+
+              > — __Joe Armstrong__
+
+              Phil Wadler and Simon Marlow worked on a type system for over a year and the results were published in [20]. The results of the project were somewhat disappointing. To start with, only a subset of the language was type-checkable, the major omission being the lack of process types and of type checking inter-process messages.
+            </p>
+          </section>
+          <section>
+            <h2>Okay maybe let's try something else</h2>
+            <p data-markdown class="xsmall">
+              - Optimistic Strategy
+              - Success Typing
+              - Gradual Typing
+            </p>
+          </section>
+          <section>
+            <img src="https://i.imgflip.com/2svo8b.jpg">
+          </section>
+        </section>
+        <section>
+          <section><h2>Some common errors</h2></section>
+          <section>
+            <h2>Unreachable Code</h2>
+            <img data-fragment-index="1" class="fragment fade-in" src="img/drake1.png" style="float: left; width: 20%;">
+
+            <div data-markdown class="small" style="float: right; width: 75%;">
+              ```elixir
+              defmodule Example1 do
+                @moduledoc """
+                You don't even need to use typespecs
+                to get errors from dialyzer
+                """
+
+                @sessions %{
+                  user1: DateTime.utc_now(),
+                  user2: DateTime.utc_now()
+                }
+
+                def has_session(user) do
+                  case Map.get(@sessions, user) do
+                    some_user -> true
+                    nil -> false
+                  end
+                end
+              end
+              ```
+            </div>
+
+            <div data-fragment-index="1" class="fragment fade-in xsmall" style="clear: both;">
+              =>
+              <pre class="red-text">
+lib/example1.ex:11:pattern_match_cov
+The pattern
+nil
+
+can never match since previous clauses completely cover the type
+any()
+________________________________________________________________________________
+              </pre>
+            </div>
+          </section>
+          <section>
+            <img src="img/drake2.png" style="float: left; width: 20%;">
+
+            <div data-markdown class="small" style="float: right; width: 75%;">
+              ```elixir
+              defmodule Example1 do
+
+                @sessions %{
+                  user1: DateTime.utc_now(),
+                  user2: DateTime.utc_now()
+                }
+
+                def has_session(user) do
+                  case Map.get(@sessions, user) do
+                    nil -> false       # Explicit matches first
+                    some_user -> true  # Save greedy matches for last
+                  end
+                end
+              end
+              ```
+            </div>
+          </section>
+          <section>
+            <h2>Overlapping Domains</h2>
+            <img data-fragment-index="1" class="fragment fade-in" src="img/drake1.png" style="float: left; width: 20%;">
+
+            <div data-markdown class="small" style="float: right; width: 75%;">
+              ```elixir
+              @spec respawn(cat()) :: cat()
+              def respawn(%{__cat__: _, lives: lives} = cat)
+                  when lives > 0 do
+                %{cat | lives: lives - 1}
+              end
+
+              @spec respawn(cat()) :: :dead
+              def respawn(%{__cat__: _, lives: lives})
+                  when lives == 0,
+                  do: :dead
+              ```
+            </div>
+            <div data-fragment-index="1" class="fragment fade-in xsmall" style="clear: both;">
+              =>
+              <pre class="red-text">
+lib/example2.ex:14:overlapping_contract
+Overloaded contract for KitHub.respawn/1 has
+overlapping domains; such contracts are currently unsupported and
+are simply ignored.
+________________________________________________________________________________
+              </pre>
+            </div>
+          </section>
+          <section>
+            <img src="img/drake2.png" style="float: left; width: 20%;">
+
+            <div data-markdown class="small" style="float: right; width: 75%;">
+                ```elixir
+                @spec respawn(cat()) :: cat() | :dead
+                def respawn(%{__cat__: _, lives: lives} = cat)
+                    when lives > 0 do
+                  %{cat | lives: lives - 1}
+                end
+
+                def respawn(%{__cat__: _, lives: lives})
+                    when lives == 0,
+                    do: :dead
+                ```
+            </div>
+          </section>
+          <section>
+            <h2>Structs are not supported</h2>
+            <img src="img/computer-1295358_1280.png" style="height: 400px;">
+
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Dialyzer Tips</h2>
+            <p data-markdown class="xsmall">
+              > Dialyzer will often prove to be a true friend when programming Erlang, although the frequent nags might tempt you to just drop it. One thing to remember is that Dialyzer is practically never wrong, and you will likely be. You might feel like some errors mean nothing, but contrary to many type systems, Dialyzer only speaks out when it knows it's right, and bugs in its code base are rare. Dialyzer might frustrate you, force you to be humble, but it will be very unlikely to be the source of bad, unclean code.
+            </p>
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
+</html>
