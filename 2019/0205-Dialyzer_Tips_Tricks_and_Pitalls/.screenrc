@@ -1,7 +1,7 @@
 screen -t "Presentation"
-stuff "yarn install && yarn start^M"
+stuff "npm install && npm run start^M"
 screen -t "Problem 1"
-stuff "iex --remsh test@herman-Galago-Pro --cookie 1234 --sname herman^M"
+stuff "iex -S mix^M"
 
 # Color Settings
 altscreen on

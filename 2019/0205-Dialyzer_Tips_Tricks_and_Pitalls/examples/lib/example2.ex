@@ -39,7 +39,7 @@ defmodule KitHub do
     end
   end
 
-  @spec generate_cat(String.t()) :: cat()
+  @spec generate_cat(binary()) :: cat()
   def generate_cat(name) when is_binary(name) do
     %{
       __cat__: name,
