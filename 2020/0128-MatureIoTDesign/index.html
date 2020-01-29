@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>Mature IoT Design</title>
+
+    <link
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/reveal.css" />
+    <link rel="stylesheet" href="css/theme/black.css" />
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/monokai.css" />
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match(/print-pdf/gi)
+        ? 'css/print/pdf.css'
+        : 'css/print/paper.css';
+      document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section data-markdown>
+          ### Mature IoT Design
+          <p>_By Herman Singh_</p>
+
+          <p>
+            Email: <a href="mailto:hsingh@dynamix-ltd.com">herman@dynamix-ltd.com</a>
+          </p>
+          <p>
+            Twitter: [@SinghHermann](https://twitter.com/singhhermann)
+          </p>
+          <p>
+            GitHub: [@Kartstig](https://github.com/Kartstig)
+          </p>
+          <p>These slides: https://github.com/Kartstig/talks</p>
+        </section>
+
+        <section>
+          <h4>This Talk</h2>
+          <p data-markdown style="text-align: left">
+            <ul>
+              <li>Naive Implmentation</li>
+              <li>Updates</li>
+              <li>Fault Tolerance</li>
+              <li>Future</li>
+            </ul>
+          </p>
+        </section>
+
+        <section>
+          <section>
+              <h2>Naive Implmentation</h2>
+              <img height="250px" src="https://upload.wikimedia.org/wikipedia/commons/c/cc/RPi-Logo-PRINT.png">
+              <img height="250px" src="https://upload.wikimedia.org/wikipedia/commons/0/04/Debian_logo.png">
+          </section>
+
+          <section>
+            <h2>Operating System</h2>
+            <h4>Raspbian Buster Lite</h4>
+            <ul>
+              <li>435MB</li>
+              <li>&lt; 300MB RAM Overhead</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Partitions</h2>
+            <ul>
+              <pre>
+pi@DES-Beacon:~ $ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        15G  3.1G   11G  23% /
+devtmpfs        460M     0  460M   0% /dev
+tmpfs           464M     0  464M   0% /dev/shm
+tmpfs           464M   47M  417M  11% /run
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           464M     0  464M   0% /sys/fs/cgroup
+/dev/mmcblk0p1   44M   23M   22M  51% /boot
+              </pre>
+              <li>+ Simple (initial Development)</li>
+              <li>- Slow (for scale)</li>
+              <li>- Not Fault Tolerant to Power Failure</li>
+              <li>- Not Fault Tolerant to Updater Failure</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Updater</h2>
+            <ol>
+              <li>Determine Target Version</li>
+              <li>Download Update</li>
+              <li>Unpack update into directory</li>
+              <li>Install Dependencies (Python)</li>
+              <li>Update Cron</li>
+              <li>Update Nginx</li>
+              <li>Update Systemd</li>
+              <li>Restart Processes</li>
+            </ol>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Mature Implmentation</h2>
+            <img height="250px" src="https://upload.wikimedia.org/wikipedia/commons/c/cc/RPi-Logo-PRINT.png">
+            <img max-height="250px" src="https://git.yoctoproject.org/cgit/yocto-project-transp.png">
+            <img max-height="250px" src="https://bootlin.com/wp-content/uploads/2015/05/logo-buildroot.png">
+            <img max-height="250px" src="/img/mender.png">
+          </section>
+          <section>
+            <h2>Operating System</h2>
+            <h4>Raspbian Buster Lite (Still a great choice)</h4>
+            <ul>
+              <li>435MB</li>
+              <li>&lt; 300MB RAM Overhead</li>
+            </ul>
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h4>Yocto/Buildroot (Custom Linux)</h4>
+            <ul>
+              <li>84MB (really slim)</li>
+              <li>&lt; 50MB RAM Overhead</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Yocto / Mender</h2>
+            <img height="600px" src="/img/mender-architecture.png">
+          </section>
+
+          <section>
+            <h2>Partitions</h2>
+            <ul>
+              <img src="/img/partition-table-layout-rootfs-kernel-updates.png">
+              <li>- Complex (initial development)</li>
+              <li>+ Fast (for scale)</li>
+              <li>+ Fault Tolerant to Power Failure</li>
+              <li>+ Fault Tolerant to Updater Failure</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Updater</h2>
+            <ol style="font-size: 0.7em;">
+              <li>Determine Target Version</li>
+              <li>Download Update</li>
+              <li>Mount 2nd partition (writeable)</li>
+              <li>Expand Update into 2nd partition</li>
+              <li>Install Dependencies (Python)</li>
+              <li>Update Cron</li>
+              <li>Update Nginx</li>
+              <li>Update Systemd</li>
+              <li>Set Update Flag</li>
+              <li>Reboot System</li>
+              <li>
+                <ul>
+                  <li>Success -> Do Nothing</li>
+                  <li>Failure -> Rollback (Set Update Flag & Reboot)</li>
+                </ul>
+              </li>
+            </ol>
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        hash: true,
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/highlight/highlight.js' },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+  </body>
+</html>
