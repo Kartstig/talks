@@ -4,6 +4,7 @@ Various talks by Herman Singh
 
 ### 2020
 
+- [FaaS - Serverless with AWS Lambda](2020/0311-serverless-with-aws-lambda)
 - [Mature IoT Design](2020/0128-MatureIoTDesign)
 
 ### 2019
